@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# 测试 & 覆盖率
+.pytest_cache/
+.coverage
+htmlcov/
+
+# uv
+uv.lock

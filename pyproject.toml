@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langchain-openai-thinking-agui"
+version = "0.1.0"
+description = "LangChain chat model wrappers that expose reasoning/thinking content in ag-ui-langgraph compatible format"
+readme = "README.md"
+authors = [
+    { name = "RyanDuan", email = "duan1619794359@gmail.com" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["langchain", "thinking", "reasoning", "ag-ui", "langgraph", "deepseek", "kimi"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "langchain-core>=0.3",
+    "langchain-openai>=0.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/ryanqduan/langchain-openai-thinking-agui"
+Issues = "https://github.com/ryanqduan/langchain-openai-thinking-agui/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/langchain_openai_thinking_agui"]
