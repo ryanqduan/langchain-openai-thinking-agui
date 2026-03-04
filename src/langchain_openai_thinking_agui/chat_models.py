@@ -12,6 +12,7 @@ from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_openai import ChatOpenAI as _ChatOpenAIBase
 
+
 # ── 共享工具函数 ──────────────────────────────────────────────────────────────
 
 def _build_thinking_content(reasoning: str, text: str) -> list:
@@ -26,7 +27,6 @@ def _build_thinking_content(reasoning: str, text: str) -> list:
 def _extract_reasoning(msg_dict: dict) -> Optional[str]:
     """从 message 字典中提取思考内容（兼容 reasoning_content / thinking_content 字段名）。"""
     return msg_dict.get("reasoning_content") or msg_dict.get("thinking_content")
-
 
 
 # ── ChatOpenAIWithThinking ────────────────────────────────────────────────────
@@ -65,10 +65,10 @@ class ChatOpenAIWithThinking(_ChatOpenAIBase):
         return result
 
     def _convert_chunk_to_generation_chunk(
-        self,
-        chunk: dict,
-        default_chunk_class: type,
-        base_generation_info: Optional[dict],
+            self,
+            chunk: dict,
+            default_chunk_class: type,
+            base_generation_info: Optional[dict],
     ) -> Optional[ChatGenerationChunk]:
         # 先由父类处理常规逻辑
         gen_chunk = super()._convert_chunk_to_generation_chunk(
@@ -82,7 +82,7 @@ class ChatOpenAIWithThinking(_ChatOpenAIBase):
 
         reasoning_delta = (choices[0].get("delta") or {}).get("reasoning_content")
         if not reasoning_delta:
-            if gen_chunk and gen_chunk.message.content == "":
+            if gen_chunk and gen_chunk.message.content == "" and not gen_chunk.message.tool_call_chunks:
                 return None
             return gen_chunk
 
