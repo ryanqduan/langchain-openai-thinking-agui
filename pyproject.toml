@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langchain-openai-thinking-agui"
-version = "0.1.0"
+version = "0.2.0"
 description = "LangChain chat model wrappers that expose reasoning/thinking content in ag-ui-langgraph compatible format"
 readme = "README.md"
 authors = [

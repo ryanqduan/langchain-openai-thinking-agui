@@ -17,7 +17,7 @@ from langchain_openai import ChatOpenAI as _ChatOpenAIBase
 def _build_thinking_content(reasoning: str, text: str) -> list:
     """构建 ag_ui_langgraph 可识别的 Anthropic content blocks。"""
     return [
-        {"type": "text", "thinking": reasoning, "index": 0},
+        {"type": "thinking", "thinking": reasoning, "index": 0},
         {"type": "text", "text": text},
     ]
 
@@ -79,12 +79,14 @@ class ChatOpenAIWithThinking(_ChatOpenAIBase):
 
         reasoning_delta = (choices[0].get("delta") or {}).get("reasoning_content")
         if not reasoning_delta:
+            if gen_chunk and gen_chunk.message.content == "":
+                return None
             return gen_chunk
 
         # 将普通 chunk 替换为思考 chunk，保留父类已解析的 generation_info
         return ChatGenerationChunk(
             message=AIMessageChunk(
-                content=[{"type": "text", "thinking": reasoning_delta, "index": 0}]
+                content=[{"type": "thinking", "thinking": reasoning_delta, "index": 0}]
             ),
             generation_info=gen_chunk.generation_info if gen_chunk else None,
         )
