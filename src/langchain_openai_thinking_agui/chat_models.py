@@ -16,15 +16,17 @@ from langchain_openai import ChatOpenAI as _ChatOpenAIBase
 
 def _build_thinking_content(reasoning: str, text: str) -> list:
     """构建 ag_ui_langgraph 可识别的 Anthropic content blocks。"""
-    return [
-        {"type": "thinking", "thinking": reasoning, "index": 0},
-        {"type": "text", "text": text},
-    ]
+    blocks = [{"type": "thinking", "thinking": reasoning, "index": 0}]
+    # text 为空时（纯 tool_call 场景）不添加 text block，避免前端渲染空气泡
+    if text:
+        blocks.append({"type": "text", "text": text})
+    return blocks
 
 
 def _extract_reasoning(msg_dict: dict) -> Optional[str]:
     """从 message 字典中提取思考内容（兼容 reasoning_content / thinking_content 字段名）。"""
     return msg_dict.get("reasoning_content") or msg_dict.get("thinking_content")
+
 
 
 # ── ChatOpenAIWithThinking ────────────────────────────────────────────────────
@@ -38,11 +40,10 @@ class ChatOpenAIWithThinking(_ChatOpenAIBase):
     """
 
     def _create_chat_result(
-        self,
-        response: Any,
-        generation_info: Optional[dict] = None,
+            self,
+            response: Any,
+            generation_info: Optional[dict] = None,
     ) -> ChatResult:
-        # 先由父类完成常规字段的解析
         result = super()._create_chat_result(response, generation_info)
 
         response_dict = response if isinstance(response, dict) else response.model_dump()
@@ -50,13 +51,15 @@ class ChatOpenAIWithThinking(_ChatOpenAIBase):
             reasoning = _extract_reasoning(res.get("message", {}))
             if not reasoning:
                 continue
-            # 将父类生成的 AIMessage 替换为带 thinking blocks 的版本
-            orig: AIMessage = result.generations[i].message  # type: ignore[assignment]
+
+            orig: AIMessage = result.generations[i].message
             result.generations[i].message = AIMessage(
-                content=_build_thinking_content(reasoning, orig.content),  # type: ignore[arg-type]
+                content=_build_thinking_content(reasoning, orig.content),
                 additional_kwargs=orig.additional_kwargs,
                 usage_metadata=orig.usage_metadata,
                 id=orig.id,
+                tool_calls=orig.tool_calls,
+                invalid_tool_calls=orig.invalid_tool_calls,
             )
 
         return result
